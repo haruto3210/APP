@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ダウンロードページ</title>
+
+  <!-- ファビコン -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #f2f5f9;
+      --text: #222;
+      --card-bg: #ffffff;
+      --card-border: #d0d7de;
+      --title: #005fcc;
+      --desc: #444;
+      --btn: #007bff;
+      --btn-hover: #0a84ff;
+    }
+
+    body.dark {
+      --bg: #0d1117;
+      --text: #e6edf3;
+      --card-bg: #161b22;
+      --card-border: #30363d;
+      --title: #79c0ff;
+      --desc: #c9d1d9;
+      --btn: #238636;
+      --btn-hover: #2ea043;
+    }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 40px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 32px;
+      color: var(--title);
+    }
+
+    /* 検索バー */
+    .search-box {
+      display: block;
+      margin: 0 auto 30px auto;
+      padding: 12px 15px;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      font-size: 16px;
+      background: var(--card-bg);
+      color: var(--text);
+    }
+
+    /* ダークモード切り替え */
+    .toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text);
+      transition: 0.3s;
+      z-index: 999;
+    }
+
+    /* Google翻訳 */
+    #google_translate_element {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 999;
+    }
+
+    /* グリッド */
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    /* カード */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: 0.3s;
+      opacity: 0;
+      animation: fadeIn 0.6s forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .title {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: var(--title);
+      font-weight: bold;
+    }
+
+    .desc {
+      font-size: 14px;
+      margin-bottom: 15px;
+      color: var(--desc);
+    }
+
+    .downloads {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--desc);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background: var(--btn);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: var(--btn-hover);
+    }
+
+    /* モーダル */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+    }
+
+    .modal button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .agree {
+      background: var(--btn);
+      color: white;
+    }
+
+    .cancel {
+      background: #777;
+      color: white;
+      margin-left: 10px;
+    }
+    /* OS警告（背景） */
+.os-warning {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.6);
+  z-index:999999;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* 警告ボックス（ガラス風＋ネオン枠） */
+.os-box {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%, -50%) scale(0.8);
+  width:90%;
+  max-width:450px;
+  padding:30px;
+  background: rgba(20,20,20,0.7);
+  border:2px solid #00c3ff;
+  border-radius:15px;
+  color:white;
+  text-align:center;
+  box-shadow:0 0 20px #00c3ff;
+  animation: popIn 0.4s ease forwards;
+}
+
+/* 英語部分 */
+.os-box .en {
+  margin-top:20px;
+  font-size:16px;
+  opacity:0.8;
+}
+
+/* 閉じるボタン */
+.close-btn {
+  margin-top:25px;
+  padding:10px 20px;
+  font-size:18px;
+  background:#00c3ff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  color:black;
+  font-weight:bold;
+  transition:0.2s;
+}
+
+.close-btn:hover {
+  background:#00e1ff;
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+
+@keyframes popIn {
+  0% { transform:translate(-50%, -50%) scale(0.7); opacity:0; }
+  100% { transform:translate(-50%, -50%) scale(1); opacity:1; }
+}
+
+  </style>
+</head>
+<body>
+
+<!-- OS警告（Windows 32bit） -->
+<!-- Windows 32bit 警告 -->
+<div id="os-warning-32" class="os-warning">
+  <div class="os-box">
+    <h2>⚠ Windows 32bit 警告</h2>
+    <p>あなたのOSはWindowsですが、32bitです。<br>
+    一部のAPPが動かない可能性があります。</p>
+
+    <p class="en">
+      Your OS is Windows, but it is 32-bit.<br>
+      Some apps may not work correctly.
+    </p>
+
+    <button onclick="closeOSWarning()" class="close-btn">閉じる / Close</button>
+  </div>
+</div>
+
+<!-- Windows以外のOS警告 -->
+<div id="os-warning-other" class="os-warning">
+  <div class="os-box">
+    <h2>⚠ OSエラー</h2>
+    <p>あなたのOSでは、APPが動かない可能性が非常に高いです。<br>
+    Windows10 64bit以上のデバイスで開きなおしてください。</p>
+
+    <p class="en">
+      The app is very unlikely to work on your operating system.<br>
+      Please try opening it again on a Windows 10 64-bit or later device.
+    </p>
+
+    <button onclick="closeOSWarning()" class="close-btn">閉じる / Close</button>
+  </div>
+</div>
+
+<!-- Google翻訳 -->
+<div id="google_translate_element"></div>
+
+<!-- ダークモード -->
+<div class="toggle" onclick="toggleDark()">🌙 / ☀️</div>
+
+<h1>APP Download</h1>
+
+<input type="text" id="search" placeholder="ファイルを検索..." class="search-box">
+
+<div class="container">
+
+  <!-- ファイル1 -->
+  <div class="card">
+    <div class="title">Tactical FPS Installer v1.0.5</div>
+    <div class="desc">canvasで作られたゲームのインストーラーです。</div>
+    <button class="btn" onclick="openModal('https://github.com/haruto3210/3dgame-tactical-fps/releases/download/v1.0.55/tactical-fps_Setup.installer.v1.0.5.exe')">
+      <i class="fa-solid fa-download"></i> ダウンロード
+    </button>
+    <div class="downloads" id="fpsCount">読み込み中...</div>
+  </div>
+
+  <!-- ファイル2 -->
+  <div class="card">
+    <div class="title">Edge Utility v1.0.1</div>
+    <div class="desc">Edge 用のユーティリティツール（BATファイル）。</div>
+    <button class="btn" onclick="openModal('https://github.com/haruto3210/Extension-Forced-Removal-Tool/releases/download/edgev1.0.1/edgev1.0.1.bat')">
+      <i class="fa-solid fa-download"></i> ダウンロード
+    </button>
+    <div class="downloads" id="edgeCount">読み込み中...</div>
+  </div>
+</div>
+
+<!-- モーダル -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>利用規約</h3>
+    <p>このソフトウェアを使用することで発生した問題について、作者は責任を負いません。</p>
+    <p>ダウンロードを続行するには同意してください。</p>
+
+    <button class="agree" id="agreeBtn">同意する</button>
+    <button class="cancel" onclick="closeModal()">キャンセル</button>
+  </div>
+</div>
+
+<script>
+/* OS判定 */
+let isWindows64 = false;
+
+function checkOS() {
+  const ua = navigator.userAgent.toLowerCase();
+
+  const isWindows = ua.includes("windows nt");
+  const isWin10 = ua.includes("windows nt 10");
+  const isWin11 = ua.includes("windows nt 11");
+
+  const is64bit = ua.includes("win64") || ua.includes("wow64") || ua.includes("x64");
+
+  if (isWindows) {
+    if (!is64bit) {
+      document.getElementById("os-warning-32").style.display = "block";
+      disableDownloads();
+      return;
+    }
+
+    if (!(isWin10 || isWin11)) {
+      document.getElementById("os-warning-other").style.display = "block";
+      disableDownloads();
+      return;
+    }
+
+    isWindows64 = true;
+    return;
+  }
+
+  document.getElementById("os-warning-other").style.display = "block";
+  disableDownloads();
+}
+
+function closeOSWarning() {
+  document.getElementById("os-warning-32").style.display = "none";
+  document.getElementById("os-warning-other").style.display = "none";
+}
+
+/* Windows64bit 以外はダウンロードボタンを無効化 */
+function disableDownloads() {
+  document.querySelectorAll(".btn").forEach(btn => {
+    btn.style.background = "#555";
+    btn.style.cursor = "not-allowed";
+    btn.onclick = function() {
+      alert("このOSではダウンロードできません。\nWindows 10 64bit 以上でアクセスしてください。");
+    };
+  });
+}
+
+checkOS();
+
+
+/* ダークモード */
+function toggleDark() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+}
+
+if (localStorage.getItem("darkMode") === "true") {
+  document.body.classList.add("dark");
+}
+
+/* 検索 */
+document.getElementById("search").addEventListener("input", function() {
+  const keyword = this.value.toLowerCase();
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    card.style.display = text.includes(keyword) ? "block" : "none";
+  });
+});
+
+/* モーダル */
+let downloadUrl = "";
+
+function openModal(url) {
+  downloadUrl = url;
+  document.getElementById("modalBg").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("modalBg").style.display = "none";
+}
+
+document.getElementById("agreeBtn").onclick = function() {
+  window.location.href = downloadUrl;
+  closeModal();
+};
+
+/* ダウンロード数 */
+async function loadDownloadCounts() {
+  const fps = await fetch("https://api.github.com/repos/haruto3210/3dgame-tactical-fps/releases").then(r => r.json());
+  const fpsAsset = fps[0].assets.find(a => a.name.includes("tactical-fps"));
+  document.getElementById("fpsCount").innerText = `ダウンロード数: ${fpsAsset.download_count} 回`;
+
+  const edge = await fetch("https://api.github.com/repos/haruto3210/Extension-Forced-Removal-Tool/releases").then(r => r.json());
+  const edgeAsset = edge[0].assets.find(a => a.name.includes("edgev1.0.1"));
+  document.getElementById("edgeCount").innerText = `ダウンロード数: ${edgeAsset.download_count} 回`;
+
+  const bloc = await fetch("https://api.github.com/repos/haruto3210/blocgeme/releases").then(r => r.json());
+  const blocAsset = bloc[0].assets.find(a => a.name.includes("blocgeme_installer"));
+  document.getElementById("blocCount").innerText = `ダウンロード数: ${blocAsset.download_count} 回`;
+}
+
+loadDownloadCounts();
+</script>
+
+<!-- Google翻訳 -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'ja',
+      includedLanguages: 'ja,en,zh-CN,zh-TW,ko,fr,es,de,ru,ar',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
