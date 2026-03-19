@@ -303,35 +303,47 @@
 
 <div class="container">
 
-  <!-- ファイル1 -->
-  <div class="card">
-    <div class="title">Tactical FPS Installer v1.0.5</div>
-    <div class="desc">canvasで作られたゲームのインストーラーです。</div>
-    <button class="btn" onclick="openModal('https://github.com/haruto3210/3dgame-tactical-fps/releases/download/v1.0.55/tactical-fps_Setup.installer.v1.0.5.exe')">
-      <i class="fa-solid fa-download"></i> ダウンロード
-    </button>
-    <div class="downloads" id="fpsCount">読み込み中...</div>
-  </div>
+<!-- ファイル1（OS規制 ON） -->
+<div class="card" data-oslock="on">
+  <div class="title">Tactical FPS Installer v1.0.5</div>
+  <div class="desc">canvasで作られたゲームのインストーラーです。</div>
 
-  <!-- ファイル2 -->
-  <div class="card">
-    <div class="title">Edge Utility v1.0.1</div>
-    <div class="desc">Edge 用のユーティリティツール（BATファイル）。</div>
-    <button class="btn" onclick="openModal('https://github.com/haruto3210/Extension-Forced-Removal-Tool/releases/download/edgev1.0.1/edgev1.0.1.bat')">
-      <i class="fa-solid fa-download"></i> ダウンロード
-    </button>
-    <div class="downloads" id="edgeCount">読み込み中...</div>
-  </div>
+  <button class="btn download-btn"
+    data-url="https://github.com/haruto3210/3dgame-tactical-fps/releases/download/v1.0.55/tactical-fps_Setup.installer.v1.0.5.exe">
+    <i class="fa-solid fa-download"></i> ダウンロード
+  </button>
 
-  <!-- ファイル3 -->
-  <div class="card">
-    <div class="title">BlocGame Installer v1.0.0</div>
-    <div class="desc">BlocGame のセットアップファイルです。</div>
-    <button class="btn" onclick="openModal('https://github.com/haruto3210/blocgeme/releases/download/v1.0.0/blocgeme_installer_v1.0.0.exe')">
-      <i class="fa-solid fa-download"></i> ダウンロード
-    </button>
-    <div class="downloads" id="blocCount">読み込み中...</div>
-  </div>
+  <div class="downloads" id="fpsCount">読み込み中...</div>
+</div>
+
+
+<!-- ファイル2（OS規制 ON） -->
+<div class="card" data-oslock="on">
+  <div class="title">Edge Utility v1.0.1</div>
+  <div class="desc">Edge 用のユーティリティツール（BATファイル）。</div>
+
+  <button class="btn download-btn"
+    data-url="https://github.com/haruto3210/Extension-Forced-Removal-Tool/releases/download/edgev1.0.1/edgev1.0.1.bat">
+    <i class="fa-solid fa-download"></i> ダウンロード
+  </button>
+
+  <div class="downloads" id="edgeCount">読み込み中...</div>
+</div>
+
+
+<!-- ファイル3（OS規制 OFF → どのOSでもDL可能） -->
+<div class="card" data-oslock="on">
+  <div class="title">BlocGame Installer v1.0.0</div>
+  <div class="desc">BlocGame のセットアップファイルです。</div>
+
+  <button class="btn download-btn"
+    data-url="https://github.com/haruto3210/blocgeme/releases/download/v1.0.0/blocgeme_installer_v1.0.0.exe">
+    <i class="fa-solid fa-download"></i> ダウンロード
+  </button>
+
+  <div class="downloads" id="blocCount">読み込み中...</div>
+</div>
+
 
 </div>
 
@@ -348,6 +360,7 @@
 </div>
 
 <script>
+
 /* OS判定 */
 let isWindows64 = false;
 
@@ -399,6 +412,34 @@ function disableDownloads() {
 
 checkOS();
 
+// OS判定結果（前のコードで設定済み）
+let isWindows64 = false;
+
+// ダウンロードボタン制御
+function setupDownloadButtons() {
+  document.querySelectorAll(".download-btn").forEach(btn => {
+    const card = btn.closest(".card");
+    const osLock = card.getAttribute("data-oslock"); // "on" or "off"
+    const url = btn.getAttribute("data-url");
+
+    // OS規制ON かつ Windows64bit ではない場合 → 無効化
+    if (osLock === "on" && !isWindows64) {
+      btn.style.background = "#555";
+      btn.style.cursor = "not-allowed";
+      btn.onclick = function() {
+        alert("このOSではダウンロードできません。\nWindows 10 64bit 以上でアクセスしてください。");
+      };
+    } else {
+      // 通常のダウンロード処理
+      btn.onclick = function() {
+        openModal(url);
+      };
+    }
+  });
+}
+
+// OSチェック後に実行
+setTimeout(setupDownloadButtons, 200);
 
 /* ダークモード */
 function toggleDark() {
