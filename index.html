@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <title>ダウンロードページ</title>
 
-  <!-- ファビコン -->
+  <!-- ファビコン（あなたの虹色Hアイコンを使う場合） -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-
 
   <!-- アイコン（Font Awesome） -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -76,10 +75,19 @@
       cursor: pointer;
       color: var(--text);
       transition: 0.3s;
+      z-index: 999;
     }
 
     .toggle:hover {
       opacity: 0.8;
+    }
+
+    /* Google翻訳の位置 */
+    #google_translate_element {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 999;
     }
 
     /* 自動整列グリッド */
@@ -159,6 +167,7 @@
       background: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
+      z-index: 9999;
     }
 
     .modal {
@@ -198,6 +207,10 @@
 </head>
 <body>
 
+  <!-- Google翻訳 -->
+  <div id="google_translate_element"></div>
+
+  <!-- ダークモード切り替え -->
   <div class="toggle" onclick="toggleDark()">🌙 / ☀️</div>
 
   <h1>ダウンロードページ</h1>
@@ -242,7 +255,7 @@
   <div class="modal-bg" id="modalBg">
     <div class="modal">
       <h3>利用規約</h3>
-      <p>このソフトウェアを使用することで発生したいかなる問題についても、作者は責任を負いません。</p>
+      <p>このソフトウェアを使用することで発生した問題について、作者は責任を負いません。</p>
       <p>ダウンロードを続行するには同意してください。</p>
 
       <button class="agree" id="agreeBtn">同意する</button>
@@ -313,6 +326,19 @@
 
     loadDownloadCounts();
   </script>
+
+  <!-- Google翻訳スクリプト -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'ja',
+        includedLanguages: 'ja,en,zh-CN,zh-TW,ko,fr,es,de,ru,ar',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 </html>
